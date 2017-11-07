@@ -11,7 +11,8 @@ try:
 
 	for i in range(3):
 		print('Sending spoken language')
-		s.sendall('离散哈希算5.25.*^&%hm），为以用于.\n'.encode()+time.strftime('%m%S').encode())
+		# s.sendall('离散哈希算5.25.*^&%hm），为以用于.\n'.encode()+time.strftime('%m%S').encode())
+		s.sendall("dddh\n")
 
 		# recv = recv_one_line(s)
 		received = s.recv(1024)

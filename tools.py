@@ -1,5 +1,5 @@
 s_addr = ('18.221.53.75', 8001)
-# s_addr = ('localhost', 8001)
+# s_addr = ('jh-pc', 8001)
 
 def recv_one_line(sock, recv_buffer=4096, delim=b'\n'):
     buf = b''

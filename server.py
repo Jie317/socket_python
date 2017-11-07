@@ -19,9 +19,6 @@ class TCPHandler(socketserver.StreamRequestHandler):
             self.data = self.request.recv(1024).strip()
             if not self.data:
                 break
-            print( "{} wrote:".format(self.client_address[0]))
-            print( self.data)
-            # just send back the same data, but upper-cased
             self.server.send(self.request, self.data)
 
         self.server.remove_client(self.request)
