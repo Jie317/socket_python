@@ -1,90 +1,62 @@
+import socketserver
 import socket
-from threading import *
-from tools import *
-import select
+import threading
 
-class ModelClient(Thread):
-    """docstring for ModelClient"""
-    def __init__(self, arg):
-        super(ModelClient, self).__init__()
-        self.arg = arg
-        
+class TCPHandler(socketserver.StreamRequestHandler):
+    """
+    The request handler class for our server.
 
-class AppClient(Thread):
-    def __init__(self, socket, address, m_sock):
-        Thread.__init__(self)
-        self.sock = socket
-        self.addr = address
-        self.m_sock = m_sock
-        
-    def run(self):
-        # parse spoken language (one sentence each time)
+    It is instantiated once per connection to the server, and must
+    override the handle() method to implement communication to the
+    client.
+    """
+    def handle(self):
+        # self.request is the TCP socket connected to the client
+        self.server.add_client(self.request)
         while 1:
-        # for i in range(5):
-            sen = recv_one_line(self.sock)
-            # tmp
-            if not sen:
+            if len(self.server.clients) < 2:
+                continue
+            self.data = self.request.recv(1024).strip()
+            if not self.data:
                 break
-            self.m_sock.sendall(append_n(sen))
-            cmds = recv_one_line(self.m_sock) # transfer
-            if not cmds:
-                break
-            self.sock.sendall(append_n(cmds)) # not reached
-            confirm = recv_one_line(self.sock)
-            if not confirm:
-                break
-            self.m_sock.sendall(append_n(confirm))
-        self.sock.close()
-        print('App exited\n')
+            print( "{} wrote:".format(self.client_address[0]))
+            print( self.data)
+            # just send back the same data, but upper-cased
+            self.server.send(self.request, self.data)
 
-def get_model_sock():
-    '''temporal implementation'''
-    s_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    host = socket.gethostname()
-    port = 8000
-    s_sock.bind((host, port))
-    s_sock.listen(5)
-    
-    print('Waiting for model client to connect...')
-    m_sock, m_addr = s_sock.accept()
-    print('Model client connected from', m_addr)
-    return m_sock, s_sock
+        self.server.remove_client(self.request)
 
-def check(m_sock):
-    try:
-        m_sock.sendall(b'')
-        print('Model client already connected')
-        return True
-    except Exception as e:
-        print('Model client not connected')
-        return False   
+    # def handle(self):
+    #     # self.rfile is a file-like object created by the handler;
+    #     # we can now use e.g. readline() instead of raw recv() calls
+    #     self.data = self.rfile.readline().strip()
+    #     print("{} wrote:".format(self.client_address[0]))
+    #     print(self.data)
+    #     # Likewise, self.wfile is a file-like object used to write back
+    #     # to the client
+    #     self.wfile.write(self.data.upper())
 
-def main():
-    app_socket = None
-    while 1:
-        m_sock, s_sock = get_model_sock()  # get model client (tmp deployment)
-        ss_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ss_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        host = socket.gethostname()
-        port = 8001
-        ss_sock.bind((host, port))
-        ss_sock.listen(5)
+class Server(socketserver.ThreadingTCPServer):
 
-        # deal with apps
-        while 1:
-            if not check(m_sock):
-                break
-            if not app_socket:
-                print('Waiting for App to connect...')
-                app_socket, app_addr = ss_sock.accept()
-                print('App connected from', app_addr)
-            if not check(m_sock):
-                print('Model closed, app disconnected from', app_addr)
-                break
-            AppClient(app_socket, app_addr, m_sock).start()
-            app_socket = None
+    def __init__(self,*args,**kwargs):
+        super(Server, self).__init__(*args,**kwargs)
+        self.clients = []
+        self.lock = threading.Lock()
 
+    def add_client(self,c):
+        with self.lock:
+            print('Added client: ', c)
+            self.clients.append(c)
 
-if __name__ == '__main__':
-    main()
+    def remove_client(self,c):
+        with self.lock:
+            self.clients.remove(c)
+
+    def send(self,sender,data):
+        with self.lock:
+            for c in self.clients:
+                if c is not sender:
+                    c.sendall(data)
+
+s = Server((socket.gethostname(), 8001), TCPHandler)
+s.serve_forever()
