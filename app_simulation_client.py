@@ -10,15 +10,18 @@ try:
 	print('Connected to', s.getpeername())
 
 	for i in range(3):
-		print('Sending spoken language')
-		# s.sendall('离散哈希算5.25.*^&%hm），为以用于.\n'.encode()+time.strftime('%m%S').encode())
-		s.sendall("dddh\n")
+		print('\nSending spoken language')
 
-		# recv = recv_one_line(s)
+
+		s.sendall('离散哈希算5.25.*^&%hm），为以用于'.encode()+time.strftime('%m%S').encode())
 		received = s.recv(1024)
-		print("\nReceived: {}".format(received.decode()))
+		print("Received: {}".format(received.decode()))
+
 		# confirm parsed cmds
-		s.sendall(b'y\n')
+		s.sendall(b'y')
+		finished = s.recv(1024)
+		print("Received: {}".format(finished.decode()))
+		
 finally:
 	s.close()
 

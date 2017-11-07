@@ -8,14 +8,13 @@ print('Connected')
 while 1:
 	# recv = recv_one_line(s).decode()
 	recv = s.recv(1024)
-	print('Model received:',recv)
+	print('\nModel received:',recv)
 	# TODO: parse sentence
-
-	s.sendall(b'parsed commands\n')
+	s.sendall(b'parsed commands')
 
 	confirm = s.recv(1024)
-	print("Confirm: {}".format(confirm.decode()))
-	s.sendall(b'got confirm, finished\n')
+	print("rReceived confirm: {}".format(confirm.decode()))
+	s.sendall(b'got confirm, finished')
 
 	if b'y' in confirm:
 		pass # perform actions
