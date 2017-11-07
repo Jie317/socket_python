@@ -3,6 +3,7 @@
 # Script to samplify the commit and push steps. All the arguments are concatenated as the commmit message.
 
 git add -A
+git status
 if [ $# -eq 0 ]; then
 	echo "Warning: Better to leave a message to this commit. Using default message: update"
 	echo ""
