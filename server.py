@@ -1,6 +1,7 @@
 import socketserver
 import socket
 import threading
+from time import strftime
 
 class TCPHandler(socketserver.StreamRequestHandler):
     """
@@ -16,7 +17,7 @@ class TCPHandler(socketserver.StreamRequestHandler):
         while 1:
             if len(self.server.clients) < 2:
                 continue
-            self.data = self.request.recv(1024).strip()
+            self.data = self.request.recv(1024)
             if not self.data:
                 break
             self.server.send(self.request, self.data)
@@ -40,9 +41,9 @@ class Server(socketserver.ThreadingTCPServer):
         self.clients = []
         self.lock = threading.Lock()
 
-    def add_client(self,c):
+    def add_client(self, c):
         with self.lock:
-            print('Added client: ', c)
+            print('%s - Added client - '%strftime('%c'), c)
             self.clients.append(c)
 
     def remove_client(self,c):
@@ -57,3 +58,4 @@ class Server(socketserver.ThreadingTCPServer):
 
 s = Server((socket.gethostname(), 8001), TCPHandler)
 s.serve_forever()
+
