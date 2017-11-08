@@ -22,13 +22,17 @@ public class SocketClient
     // open a socket and connect with a timeout limit
     try
     {
-      InetAddress addr = InetAddress.getByName(s_addr);
+      /*InetAddress addr = InetAddress.getByName(s_addr);
       SocketAddress sockaddr = new InetSocketAddress(addr, port);
       sock = new Socket();
       // this method will block for the defined number of milliseconds
       int timeout = 2000;
-      sock.connect(sockaddr, timeout);
-      System.out.println("Connected to "+ sockaddr);
+      sock.connect(sockaddr, timeout);*/
+
+      sock = new Socket(s_addr, port);
+
+
+      System.out.println("Connected to ");
 
     } 
     catch (UnknownHostException e) 
