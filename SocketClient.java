@@ -4,10 +4,8 @@ import java.net.*;
 public class SocketClient
 {
   Socket sock;
-  String server = "18.221.53.75";
+  String s_addr = "18.221.53.75";
   int port = 8001;
-  String filename = "/foo/bar/application1.log";
-  String command = "tail -50 " + filename + "\n";
   
   public static void main(String[] args)
   {
@@ -17,7 +15,6 @@ public class SocketClient
   public SocketClient()
   {
     openSocket();
-    
   }
   
   private void openSocket()
@@ -25,13 +22,14 @@ public class SocketClient
     // open a socket and connect with a timeout limit
     try
     {
-      InetAddress addr = InetAddress.getByName(server);
+      InetAddress addr = InetAddress.getByName(s_addr);
       SocketAddress sockaddr = new InetSocketAddress(addr, port);
       sock = new Socket();
-  
       // this method will block for the defined number of milliseconds
       int timeout = 2000;
       sock.connect(sockaddr, timeout);
+      System.out.println("Connected to "+ sockaddr);
+
     } 
     catch (UnknownHostException e) 
     {
