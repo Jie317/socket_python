@@ -13,12 +13,12 @@ try:
 		print('\nSending spoken language')
 
 
-		s.sendall('离散哈希算5.25.*^&%hm），为以用于'.encode()+time.strftime('%m%S').encode())
+		s.sendall('Text离散哈希算5.25.*^&%hm），为以用于'.encode()+time.strftime('%m%S').encode())
 		received = s.recv(1024)
 		print("Received: {}".format(received.decode()))
 
 		# confirm parsed cmds
-		s.sendall(b'y')
+		s.sendall(b'ConfirmOk')
 		finished = s.recv(1024)
 		print("Received: {}".format(finished.decode()))
 		
